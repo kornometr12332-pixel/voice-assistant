@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>دستیار صوتی</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#05100f;--bg2:#0a1d1b;--fg:#e6fffb;--mut:#7fb5ae;--ac:#2ee6d0;--ac2:#13a898;--card:rgba(46,230,208,.07);--bd:rgba(46,230,208,.35);--glow:0 0 22px rgba(46,230,208,.45)}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+button{-webkit-tap-highlight-color:transparent;-webkit-appearance:none;appearance:none;touch-action:manipulation;user-select:none;-webkit-user-select:none;outline:none}
+button:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+.mic{transition:transform .12s,background .2s}.mic:active{transform:scale(.93)}.mic svg{pointer-events:none}
+body{margin:0;min-height:100%;font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--bg);color:var(--fg);transition:background .4s,color .4s}
+body[data-t=cyber]{--bg:#0c0620;--bg2:#190a3a;--fg:#f3e8ff;--mut:#b79be0;--ac:#c44dff;--ac2:#ff3ec8;--card:rgba(196,77,255,.09);--bd:rgba(196,77,255,.55);--glow:0 0 26px rgba(196,77,255,.6);background-image:linear-gradient(rgba(196,77,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(196,77,255,.07) 1px,transparent 1px);background-size:26px 26px}
+body[data-t=glass]{--bg:#cfd9e6;--bg2:#e9eef5;--fg:#1d2733;--mut:#566577;--ac:#4b7bd6;--ac2:#e88ac0;--card:rgba(255,255,255,.55);--bd:rgba(255,255,255,.8);--glow:0 8px 30px rgba(75,123,214,.35);background-image:radial-gradient(circle at 20% 15%,#ffd6ea 0,transparent 45%),radial-gradient(circle at 85% 80%,#bfe0ff 0,transparent 50%)}
+.app{max-width:480px;margin:0 auto;padding:14px 16px 28px;min-height:100vh;display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:18px;margin:0;font-weight:800}
+.ib{background:var(--card);border:1px solid var(--bd);color:var(--fg);border-radius:12px;padding:8px 12px;font:inherit;font-size:13px;cursor:pointer}
+.themes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.th{border:1.5px solid var(--bd);background:var(--card);border-radius:14px;padding:10px 6px;text-align:center;font:inherit;font-size:12px;color:var(--fg);cursor:pointer;backdrop-filter:blur(8px)}
+.th[aria-pressed=true]{box-shadow:var(--glow);border-color:var(--ac)}
+.th i{display:block;height:26px;border-radius:8px;margin-bottom:6px}
+.th[data-k=neon] i{background:linear-gradient(135deg,#05100f,#2ee6d0)}
+.th[data-k=cyber] i{background:linear-gradient(135deg,#190a3a,#c44dff 60%,#ff3ec8)}
+.th[data-k=glass] i{background:linear-gradient(135deg,#ffd6ea,#bfe0ff)}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:18px;border:1px solid var(--bd);border-radius:26px;background:var(--card);backdrop-filter:blur(14px);min-height:300px}
+body[data-t=cyber] .stage{box-shadow:inset 0 0 40px rgba(196,77,255,.18),var(--glow)}
+.wave{display:flex;align-items:center;gap:5px;height:70px;direction:ltr}
+.wave b{width:6px;height:10px;border-radius:4px;background:var(--ac);transition:height .12s}
+body[data-t=glass] .wave b{background:linear-gradient(var(--ac),var(--ac2))}
+.listening .wave b{animation:w .9s ease-in-out infinite alternate}
+@keyframes w{from{height:10px}to{height:64px}}
+.mic{width:96px;height:96px;border-radius:50%;border:2px solid var(--ac);background:var(--card);color:var(--ac);cursor:pointer;display:grid;place-items:center;box-shadow:var(--glow)}
+body[data-t=cyber] .mic{outline:2px dashed var(--ac2);outline-offset:6px}
+.listening .mic{background:var(--ac);color:var(--bg)}
+.mic svg{width:40px;height:40px}
+.state{font-size:14px;color:var(--mut);text-align:center;min-height:22px}
+.row{display:flex;gap:8px}
+.row input{flex:1;background:var(--card);border:1px solid var(--bd);border-radius:12px;color:var(--fg);padding:12px;font:inherit;font-size:14px;min-width:0}
+.row button{background:var(--ac);color:var(--bg);border:0;border-radius:12px;padding:0 18px;font:inherit;font-weight:600;cursor:pointer}
+body[data-t=glass] .row button{color:#fff}
+.log{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.log div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:9px 12px}
+.log small{display:block;color:var(--mut);margin-top:2px}
+.help{font-size:12px;color:var(--mut);line-height:1.9}
+dialog{border:1px solid var(--bd);border-radius:20px;background:var(--bg2);color:var(--fg);width:min(92vw,440px);padding:16px;font-family:inherit}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog textarea{width:100%;height:150px;direction:ltr;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:12px;padding:10px;font-family:monospace;font-size:12px}
+dialog label{font-size:13px;display:block;margin:10px 0 4px}
+@media (prefers-reduced-motion:reduce){.listening .wave b{animation:none;height:34px}}
+</style>
+</head>
+<body data-t="neon">
+<div class="app">
+  <header>
+    <h1>دستیار صوتی</h1>
+    <button class="ib" id="setBtn">تنظیمات</button>
+  </header>
+  <div class="themes" id="themes">
+    <button class="th" data-k="neon"><i></i>نئونی تیره</button>
+    <button class="th" data-k="cyber"><i></i>سایبرپانک</button>
+    <button class="th" data-k="glass"><i></i>شیشه‌ای</button>
+  </div>
+  <main class="stage" id="stage">
+    <div class="wave" id="wave"></div>
+    <button class="mic" id="mic" aria-label="شروع گوش دادن"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4zm6-4a6 6 0 0 1-12 0H4a8 8 0 0 0 7 7.94V22h2v-3.06A8 8 0 0 0 20 11z"/></svg></button>
+    <div class="state" id="state">دکمه میکروفون رو بزن یا دستور رو بنویس</div>
+  </main>
+  <div class="row"><input id="txt" placeholder="مثلاً: تماس با بابا" autocomplete="off"><button id="go">اجرا</button></div>
+  <div class="log" id="log"></div>
+  <div class="help">نمونه دستورها: «تماس با بابا» · «تپسی رو باز کن» · «مسیر تا میدان آزادی» · «پیام به مامان» · «ساعت چنده»</div>
+</div>
+
+<dialog id="dlg">
+  <b>تنظیمات</b>
+  <label>مخاطب‌ها (نام: شماره)</label>
+  <textarea id="cEd"></textarea>
+  <label>برنامه‌ها (نام: package name)</label>
+  <textarea id="aEd"></textarea>
+  <div class="row" style="margin-top:12px"><button id="save" style="padding:10px 18px">ذخیره</button><button class="ib" id="close">بستن</button></div>
+</dialog>
+
+<script>
+// ===== تنظیمات: وقتی APK شد DEMO رو false کن و Actions رو با پلاگین‌های native جایگزین کن =====
+const P = (window.Capacitor && Capacitor.Plugins) || {};
+const NATIVE = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+const DEMO = !NATIVE;
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let contacts = store.get('contacts', {"بابا":"09120000000","بابا غلام":"09120000000","مامان":"09130000000"});
+let apps = store.get('apps', {"اسنپ":"cab.snapp.driver","تپسی":"ir.tapsi.driver","تلگرام":"org.telegram.messenger","نشان":"org.neshan","بلد":"com.baladmaps","گوگل مپ":"com.google.android.apps.maps"});
+const $ = id => document.getElementById(id);
+
+// ===== نرمال‌سازی متن فارسی =====
+const norm = t => t.replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u200f]/g,' ')
+  .replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+  .replace(/[؟?!.،,]/g,' ').replace(/\s+/g,' ').trim();
+
+// ===== اجراکننده‌ها (جایگزین در APK با Capacitor) =====
+const open = async url => { try{ await P.AppLauncher.openUrl({url}); return true; }catch(e){ return false; } };
+let phoneContacts = {};
+const allContacts = () => ({...phoneContacts, ...contacts});
+async function loadPhoneContacts(){
+  if(DEMO || !P.Contacts) return;
+  try{
+    const perm = await P.Contacts.requestPermissions();
+    if(perm.contacts !== 'granted') return;
+    const r = await P.Contacts.getContacts({projection:{name:true, phones:true}});
+    (r.contacts||[]).forEach(c => {
+      const n = c.name && c.name.display, p = c.phones && c.phones[0] && c.phones[0].number;
+      if(n && p) phoneContacts[norm(n)] = p;
+    });
+    say('مخاطب‌ها بارگذاری شد', Object.keys(phoneContacts).length + ' مخاطب');
+  }catch(e){ say('خطا در خواندن مخاطب‌ها', String(e.message||e)); }
+}
+const Actions = {
+  call(name, num){ if(DEMO) return say(`📞 شماره‌گیری ${name}`, `tel:${num}`); say(`📞 تماس با ${name}`, ''); open('tel:'+num); },
+  async openApp(name, pkg){ if(DEMO) return say(`🚀 باز کردن ${name}`, `package: ${pkg}`); say(`🚀 باز کردن ${name}`, ''); if(!(await open(pkg))) say('باز نشد', 'package name رو چک کن: '+pkg); },
+  navigate(dest){ if(DEMO) return say(`🧭 مسیر تا ${dest}`, 'geo:0,0?q='+dest); say(`🧭 مسیر تا ${dest}`, ''); open('geo:0,0?q='+encodeURIComponent(dest)); },
+  message(name, num){ if(DEMO) return say(`💬 پیام به ${name}`, `sms:${num}`); say(`💬 پیام به ${name}`, ''); open('sms:'+num); },
+  time(){ const t = new Date().toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'}); say(`🕒 ساعت ${t} است`, ''); speak(`ساعت ${t} است`); }
+};
+
+// ===== دستورها: داده‌محور =====
+const findKey = (text, map) => Object.keys(map).sort((a,b)=>b.length-a.length).find(k => text.includes(norm(k)));
+const commands = [
+  { id:'navigate', triggers:['مسیر تا','مسیر به','مسیریابی به','برو به'], run:(t,trg)=>{ const d = t.split(trg)[1].trim(); d ? Actions.navigate(d) : say('مقصد رو بگو','مثلاً: مسیر تا میدان آزادی'); } },
+  { id:'call', triggers:['تماس با','زنگ بزن به','زنگ بزن'], run:(t,trg)=>{ const m = allContacts(); const k = findKey(t.split(trg)[1]||'', m); k ? Actions.call(k, m[k]) : say('مخاطب پیدا نشد','از تنظیمات اضافه‌اش کن'); } },
+  { id:'message', triggers:['پیام به','پیامک به'], run:(t,trg)=>{ const m = allContacts(); const k = findKey(t.split(trg)[1]||'', m); k ? Actions.message(k, m[k]) : say('مخاطب پیدا نشد','از تنظیمات اضافه‌اش کن'); } },
+  { id:'open', triggers:['باز کن','باز کردن','اجرا کن'], run:(t)=>{ const k = findKey(t, apps); k ? Actions.openApp(k, apps[k]) : say('برنامه پیدا نشد','از تنظیمات اضافه‌اش کن'); } },
+  { id:'time', triggers:['ساعت چنده','ساعت چند','ساعت'], run:()=>Actions.time() }
+];
+function processCommand(raw){
+  const t = norm(raw); if(!t) return;
+  for(const c of commands){
+    const trg = c.triggers.map(norm).find(x => t.includes(x));
+    if(trg){ c.run(t, trg); return; }
+  }
+  say('دستور نامفهوم بود', '«'+raw+'»');
+}
+
+// ===== رابط =====
+function say(title, sub){
+  const d = document.createElement('div');
+  d.innerHTML = '<b></b><small></small>'; d.firstChild.textContent = title; d.lastChild.textContent = sub || '';
+  $('log').prepend(d); while($('log').children.length > 5) $('log').lastChild.remove();
+  $('state').textContent = title;
+}
+function speak(t){ try{ const u = new SpeechSynthesisUtterance(t); u.lang='fa-IR'; speechSynthesis.speak(u);}catch(e){} }
+$('wave').innerHTML = Array.from({length:19},(_,i)=>`<b style="animation-delay:${(i*70)%600}ms;--h:${20+Math.abs(9-i)*-2}px"></b>`).join('');
+
+function setTheme(k){
+  document.body.dataset.t = k; store.set('theme', k);
+  document.querySelectorAll('.th').forEach(b => b.setAttribute('aria-pressed', b.dataset.k === k));
+}
+document.querySelectorAll('.th').forEach(b => b.onclick = () => setTheme(b.dataset.k));
+setTheme(store.get('theme','neon'));
+
+$('go').onclick = () => { processCommand($('txt').value); $('txt').value=''; };
+$('txt').onkeydown = e => { if(e.key==='Enter') $('go').click(); };
+
+// ===== تشخیص گفتار =====
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, busy = false;
+$('mic').onclick = async () => {
+  if(!DEMO && P.SpeechRecognition){
+    if(busy){ try{ await P.SpeechRecognition.stop(); }catch(e){} return; }
+    try{
+      const av = await P.SpeechRecognition.available();
+      if(!av.available){ $('state').textContent = 'سرویس تشخیص گفتار گوگل روی گوشی نیست'; return; }
+      let perm = await P.SpeechRecognition.checkPermissions();
+      if(perm.speechRecognition !== 'granted') perm = await P.SpeechRecognition.requestPermissions();
+      if(perm.speechRecognition !== 'granted'){ $('state').textContent = 'اجازه میکروفون داده نشد'; return; }
+      busy = true; $('stage').classList.add('listening'); $('state').textContent = 'گوش می‌دم...';
+      const r = await P.SpeechRecognition.start({language:'fa-IR', maxResults:1, partialResults:false, popup:false});
+      const t = r && r.matches && r.matches[0];
+      if(t){ say('شنیدم: '+t, ''); processCommand(t); } else $('state').textContent = 'چیزی نشنیدم، دوباره بگو';
+    }catch(e){ $('state').textContent = 'خطا در تشخیص صدا: ' + (e.message||e); }
+    busy = false; $('stage').classList.remove('listening'); return;
+  }
+  if(!SR){ $('state').textContent = 'اینجا تشخیص صدا در دسترس نیست، دستور رو بنویس (در APK با پلاگین native کار می‌کنه)'; return; }
+  if(rec){ rec.stop(); return; }
+  rec = new SR(); rec.lang = 'fa-IR'; rec.interimResults = false;
+  rec.onstart = () => { $('stage').classList.add('listening'); $('state').textContent = 'گوش می‌دم...'; };
+  rec.onresult = e => { const t = e.results[0][0].transcript; say('شنیدم: '+t,''); processCommand(t); };
+  rec.onerror = () => { $('state').textContent = 'صدا دریافت نشد، دوباره تلاش کن'; };
+  rec.onend = () => { $('stage').classList.remove('listening'); rec = null; };
+  try{ rec.start(); }catch(e){ rec = null; }
+};
+
+// ===== تنظیمات =====
+const toTxt = o => Object.entries(o).map(([k,v])=>k+': '+v).join('\n');
+const fromTxt = s => Object.fromEntries(s.split('\n').map(l=>l.split(':').map(x=>x.trim())).filter(p=>p.length>=2&&p[0]&&p[1]).map(p=>[p[0],p.slice(1).join(':')]));
+$('setBtn').onclick = () => { $('cEd').value = toTxt(contacts); $('aEd').value = toTxt(apps); $('dlg').showModal(); };
+$('close').onclick = () => $('dlg').close();
+$('save').onclick = () => { contacts = fromTxt($('cEd').value); apps = fromTxt($('aEd').value); store.set('contacts',contacts); store.set('apps',apps); $('dlg').close(); say('تنظیمات ذخیره شد',''); };
+loadPhoneContacts();
+</script>
+</body>
+</html>
